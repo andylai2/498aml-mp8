@@ -61,12 +61,20 @@ pixelOrder = pixelOrder.astype(int)
 
 # Define constants
 thetaHH = 0.8
-thetaHX = 0.2
+thetaHX = 2
+eps = 10**(-10)
 
-# Start MFI
+# Initial energy terms
+Eq_init = np.zeros( (1, 20) )
+H = np.ones( (1, 28, 28) )
+H[Q_init < .5] = -1
+
+
+# Start MFI and calculate energy terms
 #Q_new = np.ones( (20, 28, 28) ) * Q_init
 Q = np.ones( (20, 28, 28) ) * Q_init
-for iter in np.arange(10,20):
+#test_denom = np.zeros(28)
+for iter in np.arange(10):
 	#Q_old = np.copy(Q_new)
 	for im in np.arange(20):
 		for pxl in np.arange(28*28):
@@ -75,21 +83,24 @@ for iter in np.arange(10,20):
 			X = noiseImages[im,r,c]
 			hSum = 0
 			if r - 1 > -1:
-				hSum = hSum + thetaHH * (2 * Q[im, r-1, c] - 1)
+				hSum += thetaHH * (2 * Q[im, r-1, c] - 1)
 			if r + 1 < 28:
-				hSum = hSum + thetaHH * (2 * Q[im, r+1, c] - 1)
+				hSum += thetaHH * (2 * Q[im, r+1, c] - 1)
 			if c - 1 > -1:
-				hSum = hSum + thetaHH * (2 * Q[im, r, c-1] - 1)
+				hSum += thetaHH * (2 * Q[im, r, c-1] - 1)
 			if c + 1 < 28:
-				hSum = hSum + thetaHH * (2 * Q[im, r, c+1] - 1)
+				hSum += thetaHH * (2 * Q[im, r, c+1] - 1)
 			xSum = thetaHX * X
 			logqiPos = hSum + xSum
-			Q[ im, r, c]  = np.exp(logqiPos) / (np.exp(logqiPos) + np.exp(-logqiPos))
+			Q[im, r, c]  = np.exp(logqiPos) / (np.exp(logqiPos) + np.exp(-logqiPos))
+			#print((np.exp(logqiPos) + np.exp(-logqiPos)))
+
 
 
 #print(Q[1,:,:])
-image10 = np.ones( (28, 28) )
-image10[Q[10,:,:] < .5] = -1
+cleanImages = np.ones( (20, 28, 28) )
+cleanImages[Q < 0.5] = 0
 
-plt.imshow(image10, interpolation='nearest')
+plt.imshow(cleanImages[1,:,:], interpolation='nearest')
+#plt.imshow(noiseImages[0,:,:], interpolation='nearest')
 plt.show()
