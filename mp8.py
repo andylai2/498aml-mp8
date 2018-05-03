@@ -56,6 +56,7 @@ with open('./SupplementaryAndSampleData/UpdateOrderCoordinates.csv', 'rb') as up
 	orderReader = csv.reader(updateOrderFile)
 	for row in orderReader:
 		pixelOrder[i/2,:,i%2] = row[1:]
+		i = i+1
 pixelOrder = pixelOrder.astype(int)
 
 # Define constants
@@ -86,7 +87,7 @@ for iter in np.arange(10,20):
 			Q[ im, r, c]  = np.exp(logqiPos) / (np.exp(logqiPos) + np.exp(-logqiPos))
 
 
-print(Q[1,:,:])
+#print(Q[1,:,:])
 image10 = np.ones( (28, 28) )
 image10[Q[10,:,:] < .5] = -1
 
